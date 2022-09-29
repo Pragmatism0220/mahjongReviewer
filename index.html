@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>雀魂牌谱分析——基于{{.}}</title>
+</head>
+<body>
+<script>
+    let MODE = true;
+    function switch_mode() {
+        if (true === MODE) {
+            document.getElementById("mode1").style.display = "none";
+            document.getElementById("nickname").value = ""
+            document.getElementById("mode2").style.display = "";
+            document.getElementById("choice_mode").innerHTML = " 切换为昵称输入 ";
+            MODE = !MODE
+        } else {
+            document.getElementById("mode2").style.display = "none";
+            document.getElementById("jikaze")[0].selected = true
+            document.getElementById("mode1").style.display = "";
+            document.getElementById("choice_mode").innerHTML = " 切换为自风输入 ";
+            MODE = !MODE
+        }
+    }
+</script>
+<button id="choice_mode" onclick="switch_mode()">切换为自风输入</button>
+<br/>
+<br/>
+<form action="/mahjong/analyse" method="post">雀魂牌谱网址：
+    <label>
+        <input type="text" name="url" style="width:600px;"></label>
+    <br/>
+    <br/>
+    <span id="mode1">昵称：
+        <label>
+          <input id="nickname" type="text" name="nickname" style="width:160px;">
+        </label>
+    </span>
+    <span id="mode2" style="display: none">自风：
+        <label>
+          <select id="jikaze" name="jikaze">
+            <option value="东">东</option>
+            <option value="南">南</option>
+            <option value="西">西</option>
+            <option value="北">北</option>
+          </select>
+        </label>
+      </span>
+    <br/>
+    <br/>
+    <input type="submit" value=" 分    析 ">
+</form>
+</body>
+</html>

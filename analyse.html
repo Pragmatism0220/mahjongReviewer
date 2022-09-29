@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>雀魂牌谱分析——基于{{.}}</title>
+</head>
+<body>
+    <script>
+        // https://stackoverflow.com/questions/14866775/detect-document-height-change
+        // Purpose: Make sure the scroll bar is always at the bottom of the page as the page continues to output.
+        // create an Observer instance
+        const resizeObserver = new ResizeObserver(() =>
+            window.scrollTo(0, document.body.scrollHeight)
+        )
+        // start observing a DOM node
+        resizeObserver.observe(document.body)
+    </script>
+    <pre style="word-wrap: break-word; white-space: pre-wrap;">
+</body>
+</html>
