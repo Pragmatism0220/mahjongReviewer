@@ -47,7 +47,7 @@ func exists(path string) (bool, error) {
 	return false, err
 }
 
-func engineReview(conf *Config, uuid string, nickname string, jikaze string, w http.ResponseWriter, r *http.Request) error {
+func engineReview(conf *Config, uuid string, nickname string, jikaze string, engine string, w http.ResponseWriter, r *http.Request) error {
 	// 流式传输
 	ctx := r.Context()
 	ch := make(chan struct{})
@@ -55,10 +55,10 @@ func engineReview(conf *Config, uuid string, nickname string, jikaze string, w h
 	var cmd *exec.Cmd
 
 	// windows下使用akochan官方打包好的akochan-reviewer-v0.7.1的命令
-	// cmd = exec.CommandContext(ctx, "./akochan-reviewer.exe", "-a", jikaze, "--no-open", "-i", conf.ReviewerPath+"/outputs/"+uuid+".json", "-o", conf.ReviewerPath+"/outputs/"+uuid+"_"+jikaze+".html")
+	// cmd = exec.CommandContext(ctx, "./akochan-reviewer.exe", "-a", jikaze, "--no-open", "--show-rating", "-i", conf.ReviewerPath+"/outputs/"+uuid+".json", "-o", conf.ReviewerPath+"/outputs/"+uuid+"_"+jikaze+"_"+engine+".html")
 
 	// 使用升级后的mjai-reviewer的命令（Linux）
-	cmd = exec.CommandContext(ctx, "./mjai-reviewer", "-e", conf.EngineName, "-a", jikaze, "--no-open", "-i", conf.ReviewerPath+"/outputs/"+uuid+".json", "-o", conf.ReviewerPath+"/outputs/"+uuid+"_"+jikaze+".html")
+	cmd = exec.CommandContext(ctx, "./mjai-reviewer", "-e", engine, "-a", jikaze, "--no-open", "--show-rating", "-i", conf.ReviewerPath+"/outputs/"+uuid+".json", "-o", conf.ReviewerPath+"/outputs/"+uuid+"_"+jikaze+"_"+engine+".html")
 
 	rPipe, wPipe, err := os.Pipe()
 	if err != nil {
@@ -123,7 +123,7 @@ func writeOutput(w http.ResponseWriter, input io.ReadCloser, flag *error) {
 }
 
 // 返回自风对应的下标["0", "1", "2", "3"]，以及错误信息
-func Comm(conf *Config, uuid string, nickname string, jikaze string, w http.ResponseWriter, r *http.Request) (string, error) {
+func Comm(conf *Config, uuid string, nickname string, jikaze string, engine string, w http.ResponseWriter, r *http.Request) (string, error) {
 	// 创建outputs缓存文件夹
 	path := conf.ReviewerPath + "/outputs/"
 	exist, cerr := exists(path)
@@ -204,13 +204,13 @@ func Comm(conf *Config, uuid string, nickname string, jikaze string, w http.Resp
 	}
 
 	// 检查服务器上是否有分析结果的缓存
-	exist, cerr = exists(conf.ReviewerPath + "/outputs/" + uuid + "_" + jikaze + ".html")
+	exist, cerr = exists(conf.ReviewerPath + "/outputs/" + uuid + "_" + jikaze + "_" + engine + ".html")
 	if cerr != nil {
 		log.Printf("get analysis result html file error![%v]\n", cerr)
 		return "", cerr
 	}
 	if !exist {
-		cerr = engineReview(conf, uuid, nickname, jikaze, w, r)
+		cerr = engineReview(conf, uuid, nickname, jikaze, engine, w, r)
 	}
 
 	return jikaze, cerr

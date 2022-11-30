@@ -10,7 +10,6 @@ type Config struct {
 	Username     string `json:"username"`
 	Password     string `json:"password"`
 	LoginUUID    string `json:"loginUUID"`
-	EngineName   string `json:"engineName"`
 	ReviewerPath string `json:"reviewerPath"`
 }
 

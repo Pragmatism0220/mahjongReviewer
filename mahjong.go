@@ -37,7 +37,7 @@ func getMahjongURL(w http.ResponseWriter, r *http.Request) {
 			log.Println("create template failed, err:", err)
 			return
 		}
-		err = tmpl.Execute(w, CONFIG.EngineName)
+		err = tmpl.Execute(w, nil)
 		if err != nil {
 			return
 		}
@@ -55,7 +55,7 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 			log.Println("create template failed, err:", err)
 			return
 		}
-		err = tmpl.Execute(w, CONFIG.EngineName)
+		err = tmpl.Execute(w, nil)
 		if err != nil {
 			return
 		}
@@ -64,7 +64,7 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return
 		}
-		paras := map[string]string{"url": "", "nickname": "", "jikaze": ""}
+		paras := map[string]string{"url": "", "nickname": "", "jikaze": "", "engine": "mortal"} // 默认mortal引擎
 		kaze := map[string]string{"东": "0", "南": "1", "西": "2", "北": "3"}
 		for k, v := range r.Form {
 			switch k {
@@ -73,7 +73,7 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 			case "nickname":
 				paras["nickname"] = v[0]
 			case "jikaze":
-				if len(v) != 0 && v[0] == "东" || v[0] == "南" || v[0] == "西" || v[0] == "北" {
+				if len(v) != 0 && (v[0] == "东" || v[0] == "南" || v[0] == "西" || v[0] == "北") {
 					paras["jikaze"] = kaze[v[0]]
 				} else {
 					// 返回参数格式错误
@@ -82,6 +82,12 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 					fmt.Fprintln(w, err)
 					log.Println("/analyse: ", err)
 					return
+				}
+			case "engine":
+				if len(v) != 0 && (v[0] == "mortal" || v[0] == "akochan") {
+					paras["engine"] = v[0]
+				} else {
+					paras["engine"] = "mortal"
 				}
 			}
 		}
@@ -115,7 +121,7 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				return
 			}
-			paras["jikaze"], err = tools.Comm(CONFIG, uuid, paras["nickname"], paras["jikaze"], w, r)
+			paras["jikaze"], err = tools.Comm(CONFIG, uuid, paras["nickname"], paras["jikaze"], paras["engine"], w, r)
 			if err != nil {
 				fmt.Fprintln(w, err)
 				_, err = fmt.Fprintf(w, "分析失败！\n")

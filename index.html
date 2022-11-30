@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>雀魂牌谱分析——基于{{.}}</title>
+    <title>雀魂牌谱分析</title>
 </head>
 <body>
 <script>
@@ -29,6 +29,13 @@
 <form action="/mahjong/analyse" method="post">雀魂牌谱网址：
     <label>
         <input type="text" name="url" style="width:600px;"></label>
+    &nbsp;&nbsp;引擎：
+    <label>
+        <select id="engine" name="engine">
+            <option value="mortal">mortal</option>
+            <option value="akochan">akochan</option>
+        </select>
+    </label>
     <br/>
     <br/>
     <span id="mode1">昵称：
@@ -38,14 +45,14 @@
     </span>
     <span id="mode2" style="display: none">自风：
         <label>
-          <select id="jikaze" name="jikaze">
-            <option value="东">东</option>
-            <option value="南">南</option>
-            <option value="西">西</option>
-            <option value="北">北</option>
-          </select>
+            <select id="jikaze" name="jikaze">
+                <option value="东">东</option>
+                <option value="南">南</option>
+                <option value="西">西</option>
+                <option value="北">北</option>
+            </select>
         </label>
-      </span>
+    </span>
     <br/>
     <br/>
     <input type="submit" value=" 分    析 ">

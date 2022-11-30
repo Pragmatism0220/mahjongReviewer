@@ -3,7 +3,7 @@ module mahjongSoul
 go 1.19
 
 require (
-	github.com/Pragmatism0220/majsoul v0.1.1
+	github.com/Pragmatism0220/majsoul v0.1.2
 	github.com/golang/protobuf v1.5.2
 	github.com/nbari/violetear v0.0.0-20210524103009-ce83b52538c9
 	github.com/thedevsaddam/gojsonq/v2 v2.5.2

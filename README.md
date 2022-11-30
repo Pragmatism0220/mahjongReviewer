@@ -31,7 +31,6 @@ git clone https://github.com/Pragmatism0220/mahjongReviewer.git
   "username": "example@email.com",  // 雀魂小号邮箱地址
   "password": "",                   // 雀魂小号密码
   "loginUUID": "",                  // 形如"bbd6p84-oe7u-t4qr-tteb-iwar77s63donn"，可以留空，但最好还是填上
-  "engineName": "akochan",          // 引擎名。只能为akochan或者mortal
   "reviewerPath": ""                // reviewer路径。比如在linux下：/home/user/some/dir/mjai-reviewer/
 }
 ```
