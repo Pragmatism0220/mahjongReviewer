@@ -140,6 +140,7 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 						<form id="result" action="/mahjong/result" method="post">
 							<input type="hidden" name="uuid" value=%s>
 							<input type="hidden" name="jikaze" value=%s>
+							<input type="hidden" name="engine" value=%s>
 						</form>
 						<script>setTimeout((() => document.getElementById('result').submit()), 3000);</script>
 						<script>alert("分析成功！3秒后自动跳转...");</script>
@@ -147,10 +148,10 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 				*/
 				// 以GET方式跳转到结果界面（不可回退至本页，也就是/analyse）
 				redirect := `
-					<script>setTimeout((() => window.location.replace("/mahjong/result?uuid=%s&jikaze=%s")), 3000);</script>
+					<script>setTimeout((() => window.location.replace("/mahjong/result?uuid=%s&jikaze=%s&engine=%s")), 3000);</script>
 					<script>alert("分析成功！3秒后自动跳转...");</script>
 				`
-				fmt.Fprint(w, fmt.Sprintf(redirect, uuid, paras["jikaze"]))
+				fmt.Fprint(w, fmt.Sprintf(redirect, uuid, paras["jikaze"], paras["engine"]))
 			}
 		}
 	} else {
@@ -164,7 +165,7 @@ func result(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return
 		}
-		paras := map[string]string{"uuid": "", "jikaze": ""}
+		paras := map[string]string{"uuid": "", "jikaze": "", "engine": ""}
 		for k, v := range r.Form {
 			switch k {
 			case "uuid":
@@ -182,10 +183,16 @@ func result(w http.ResponseWriter, r *http.Request) {
 					log.Println("/result: ", err)
 					return
 				}
+			case "engine":
+				if len(v) != 0 && (v[0] == "mortal" || v[0] == "akochan") {
+					paras["engine"] = v[0]
+				} else {
+					paras["engine"] = "mortal"
+				}
 			}
 		}
-		// 若没有获取到想要的uuid和jikaze参数
-		if paras["uuid"] == "" && paras["jikaze"] == "" {
+		// 若没有获取到想要的uuid或jikaze或engine参数
+		if paras["uuid"] == "" || paras["jikaze"] == "" || paras["engine"] == "" {
 			// 返回参数格式错误
 			w.WriteHeader(http.StatusBadRequest)
 			err = fmt.Errorf("parameter error")
@@ -194,7 +201,7 @@ func result(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		tmpl, err := template.ParseFiles(fmt.Sprintf(CONFIG.ReviewerPath+"/outputs/%s_%s.html", paras["uuid"], paras["jikaze"]))
+		tmpl, err := template.ParseFiles(fmt.Sprintf(CONFIG.ReviewerPath+"/outputs/%s_%s_%s.html", paras["uuid"], paras["jikaze"], paras["engine"]))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprintln(w, err)
