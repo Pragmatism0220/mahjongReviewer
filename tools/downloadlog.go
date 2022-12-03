@@ -14,7 +14,10 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-/* 当前适配版本：v0.10.154.w/code.js */
+/*
+ * 查看最新version：https://game.maj-soul.net/1/version.json
+ * 当前适配版本：v0.10.176.w/code.js
+ */
 
 const NAMEPREF = 1       //2 for english, 1 for sane amount of weeb, 0 for japanese
 const VERBOSELOG = false //dump mjs records to output - will make the file too large for tenhou.net/5 viewer
@@ -61,6 +64,7 @@ var RUNES = map[string][]string{
 }
 
 var CFG_MODE = map[string][]string{
+	/* cfg.desktop.matchmode.map_ */
 	/*matchmode*/
 	"1":  {"銅の間", "銅の間", "Bronze Room"},
 	"2":  {"銅の間", "銅の間", "Bronze Room"},
@@ -106,9 +110,11 @@ var CFG_MODE = map[string][]string{
 	"44": {"明鏡の戦", "明鏡の戦", "Battle of Clairvoyance"},
 	"45": {"闇夜の戦", "闇夜の戦", "Battle of Darkness"},
 	"46": {"幻界の戦", "幻界の戦", "Dreamland Odyssey"},
+	"47": {"占星の戦", "占星の戦", "Duel of Divination"},
 }
 
 var CFG_LEVEL = map[string][]string{
+	/* cfg.level_definition.level_definition.map_ */
 	/*level definition*/
 	"10101": {"初心★1", "初心★1", "Novice I"},
 	"10102": {"初心★2", "初心★2", "Novice II"},
@@ -185,6 +191,7 @@ var CFG_LEVEL = map[string][]string{
 }
 
 var CFG_SEX = map[string][]string{
+	/* cfg.item_definition.character.map_ */
 	/*sex of character. 1: female, 2: male*/
 	"200001": {"1", "1", "1"},
 	"200002": {"1", "1", "1"},
@@ -247,9 +254,14 @@ var CFG_SEX = map[string][]string{
 	"200059": {"1", "1", "1"},
 	"200060": {"2", "2", "2"},
 	"200061": {"1", "1", "1"},
+	"200062": {"1", "1", "1"},
+	"200063": {"1", "1", "1"},
+	"200064": {"1", "1", "1"},
+	"200065": {"1", "1", "1"},
 }
 
 var CFG_YAKU = map[string][]string{
+	/* cfg.fan.fan.map_ */
 	/*yaku name*/
 	"1":    {"門前清自摸和", "門前清自摸和", "Fully Concealed Hand"},
 	"2":    {"立直", "立直", "Riichi"},
@@ -1140,13 +1152,17 @@ func parse(record *message.ResGameRecord) map[string]interface{} {
 	}
 
 	// TODO: 这里没有解析code.js，而是偷懒把map自己扒了下来。这种做法当版本更新添加新的键值对（比如新角色、新皮肤等）之后就会失效。
-	// TODO: 临时的解决方案是设定一个初始值，比如角色默认设置为一姬，段位默认为初心等。（尚未完成）
+	// TODO: 临时的解决方案是设定一个初始值，比如角色默认设置为一姬，段位默认为初心等。这也是目前的写法。
 	// TODO: 最终的解决方案应该是搞懂code.js的接口运作方式（非常奇怪，搜不到关键词的响应，也抓不到包），然后传值进去，从中请求map等函数。
 	if record.Head.Config.Meta.ModeId != 0 { //ranked or casual.银之间、金之间之类的。
+		modeList := []string{"銅の間", "銅の間", "Bronze Room"}
+		if mode, ok := CFG_MODE[strconv.FormatUint(uint64(record.Head.Config.Meta.ModeId), 10)]; ok {
+			modeList = mode
+		}
 		if JPNAME == NAMEPREF {
-			ruledisp += CFG_MODE[strconv.FormatUint(uint64(record.Head.Config.Meta.ModeId), 10)][JPNAME]
+			ruledisp += modeList[JPNAME]
 		} else {
-			ruledisp += CFG_MODE[strconv.FormatUint(uint64(record.Head.Config.Meta.ModeId), 10)][ENNAME]
+			ruledisp += modeList[ENNAME]
 		}
 	} else if record.Head.Config.Meta.RoomId != 0 { //friendly
 		lobby = ": " + strconv.FormatUint(uint64(record.Head.Config.Meta.RoomId), 10) //can set room number as lobby number
@@ -1202,10 +1218,14 @@ func parse(record *message.ResGameRecord) map[string]interface{} {
 	// ranks
 	res["dan"] = []string{"", "", "", ""}
 	for _, e := range record.Head.Accounts {
+		levelList := []string{"初心★1", "初心★1", "Novice I"}
+		if level, ok := CFG_LEVEL[strconv.FormatUint(uint64(record.Head.Config.Meta.ModeId), 10)]; ok {
+			levelList = level
+		}
 		if JPNAME == NAMEPREF {
-			res["dan"].([]string)[e.Seat] = CFG_LEVEL[strconv.FormatUint(uint64(e.Level.Id), 10)][JPNAME]
+			res["dan"].([]string)[e.Seat] = levelList[JPNAME]
 		} else {
-			res["dan"].([]string)[e.Seat] = CFG_LEVEL[strconv.FormatUint(uint64(e.Level.Id), 10)][ENNAME]
+			res["dan"].([]string)[e.Seat] = levelList[ENNAME]
 		}
 	} // 段位罢了。例如：雀杰一星、雀杰三星。自己实现一个e.level.id -> full_name_en的映射（map）就行了。
 
@@ -1217,7 +1237,10 @@ func parse(record *message.ResGameRecord) map[string]interface{} {
 	// sex
 	res["sx"] = []string{"C", "C", "C", "C"}
 	for _, e := range record.Head.Accounts {
-		sex := CFG_SEX[strconv.FormatUint(uint64(e.Character.Charid), 10)][JPNAME]
+		sex := "1"
+		if sexList, ok := CFG_SEX[strconv.FormatUint(uint64(e.Character.Charid), 10)]; ok {
+			sex = sexList[JPNAME]
+		}
 		if sex == "1" {
 			res["sx"].([]string)[e.Seat] = "F"
 		} else if sex == "2" {

@@ -55,7 +55,7 @@ func engineReview(conf *Config, uuid string, nickname string, jikaze string, eng
 	var cmd *exec.Cmd
 
 	// windows下使用akochan官方打包好的akochan-reviewer-v0.7.1的命令
-	// cmd = exec.CommandContext(ctx, "./akochan-reviewer.exe", "-a", jikaze, "--no-open", "--show-rating", "-i", conf.ReviewerPath+"/outputs/"+uuid+".json", "-o", conf.ReviewerPath+"/outputs/"+uuid+"_"+jikaze+"_"+engine+".html")
+	// cmd = exec.CommandContext(ctx, "./akochan-reviewer.exe", "-a", jikaze, "--no-open", "-i", conf.ReviewerPath+"/outputs/"+uuid+".json", "-o", conf.ReviewerPath+"/outputs/"+uuid+"_"+jikaze+"_"+engine+".html")
 
 	// 使用升级后的mjai-reviewer的命令（Linux）
 	cmd = exec.CommandContext(ctx, "./mjai-reviewer", "-e", engine, "-a", jikaze, "--no-open", "--show-rating", "-i", conf.ReviewerPath+"/outputs/"+uuid+".json", "-o", conf.ReviewerPath+"/outputs/"+uuid+"_"+jikaze+"_"+engine+".html")
