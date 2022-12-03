@@ -1219,7 +1219,7 @@ func parse(record *message.ResGameRecord) map[string]interface{} {
 	res["dan"] = []string{"", "", "", ""}
 	for _, e := range record.Head.Accounts {
 		levelList := []string{"初心★1", "初心★1", "Novice I"}
-		if level, ok := CFG_LEVEL[strconv.FormatUint(uint64(record.Head.Config.Meta.ModeId), 10)]; ok {
+		if level, ok := CFG_LEVEL[strconv.FormatUint(uint64(e.Level.Id), 10)]; ok {
 			levelList = level
 		}
 		if JPNAME == NAMEPREF {
