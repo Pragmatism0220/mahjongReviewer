@@ -4,7 +4,7 @@
 ## 它是什么
 这是一个[mjai-reviewer](https://github.com/Equim-chan/mjai-reviewer)的前后端程序。界面非常简单。在浏览器端输入雀魂的牌谱网址，即可在服务器端调用akochan或mortal引擎对牌谱进行分析。分析过程会通过流式传输进行实时显示，并在分析结束后自动跳转至结果界面。
 
-演示过程如下图所示，依次是主界面、分析界面、结果界面：
+演示过程如下图所示，依次是主界面、分析界面、结果界面。用户可以选择从牌谱链接中自动识别玩家、或者选择自定义指定玩家进行分析：
 ![主界面](/images/mahjong.png)
 ![分析界面](/images/analyse.png)
 ![结果界面](/images/result.png)
@@ -38,7 +38,7 @@ git clone https://github.com/Pragmatism0220/mahjongReviewer.git
 ```shell
 sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"
 ```
-之后，只需要编译运行`mahjong.go`文件即可。执行过程中，缓存文件夹会生成：`mjai-reviewer/outputs/`。
+之后，只需要**编译运行`mahjong.go`文件**即可。执行过程中，缓存文件夹会生成：`mjai-reviewer/outputs/`。
 
 在浏览器端输入：
 ```

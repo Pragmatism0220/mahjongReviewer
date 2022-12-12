@@ -6,24 +6,40 @@
 </head>
 <body>
 <script>
-    let MODE = true;
+    let MODE = false;
     function switch_mode() {
         if (true === MODE) {
             document.getElementById("mode1").style.display = "none";
             document.getElementById("nickname").value = ""
             document.getElementById("mode2").style.display = "";
-            document.getElementById("choice_mode").innerHTML = " 切换为昵称输入 ";
+            document.getElementById("choice_mode").innerHTML = "切换为昵称输入";
             MODE = !MODE
         } else {
             document.getElementById("mode2").style.display = "none";
             document.getElementById("jikaze")[0].selected = true
             document.getElementById("mode1").style.display = "";
-            document.getElementById("choice_mode").innerHTML = " 切换为自风输入 ";
+            document.getElementById("choice_mode").innerHTML = "切换为自风输入";
             MODE = !MODE
         }
     }
+
+    function detect_from_url() {
+        let choice_mode_btn = document.getElementById("choice_mode");
+        let jikaze_choice = document.getElementById("jikaze");
+        let nickname_input = document.getElementById("nickname");
+        const detect = document.getElementById("detect");
+        if (detect.checked) {
+            choice_mode_btn.disabled = true;
+            jikaze_choice.disabled = true;
+            nickname_input.disabled = true;
+        } else {
+            choice_mode_btn.disabled = false;
+            jikaze_choice.disabled = false;
+            nickname_input.disabled = false;
+        }
+    }
 </script>
-<button id="choice_mode" onclick="switch_mode()">切换为自风输入</button>
+<button id="choice_mode" onclick="switch_mode()" disabled="disabled">切换为昵称输入</button>
 <br/>
 <br/>
 <form action="/mahjong/analyse" method="post">雀魂牌谱网址：
@@ -38,14 +54,20 @@
     </label>
     <br/>
     <br/>
-    <span id="mode1">昵称：
+    <span>
+        <input type="checkbox" id="detect" name="detect" value="detect" onclick="detect_from_url()" checked>
+        <label for="detect">从牌谱URL中自动检测（此选项具有更高的优先级）</label>
+    </span>
+    <br/>
+    <br/>
+    <span id="mode1" style="display: none">昵称：
         <label>
-          <input id="nickname" type="text" name="nickname" style="width:160px;">
+          <input id="nickname" type="text" name="nickname" style="width:160px;" disabled="disabled">
         </label>
     </span>
-    <span id="mode2" style="display: none">自风：
+    <span id="mode2">自风：
         <label>
-            <select id="jikaze" name="jikaze">
+            <select id="jikaze" name="jikaze" disabled="disabled">
                 <option value="东">东</option>
                 <option value="南">南</option>
                 <option value="西">西</option>
@@ -57,5 +79,8 @@
     <br/>
     <input type="submit" value=" 分    析 ">
 </form>
+<div style="height:100%; width:100%;">
+    <img style="position: absolute; float: right; right: 5px; bottom: 5px; z-index: 2;" src="https://cdn.jsdelivr.net/gh/Pragmatism0220/mahjongReviewer@latest/images/nilou.gif" alt="Nilou kawaii!!">
+</div>
 </body>
 </html>

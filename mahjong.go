@@ -64,12 +64,16 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return
 		}
-		paras := map[string]string{"url": "", "nickname": "", "jikaze": "", "engine": "mortal"} // 默认mortal引擎
+		paras := map[string]string{"url": "", "detect": "", "nickname": "", "jikaze": "", "engine": "mortal"} // 默认mortal引擎
 		kaze := map[string]string{"东": "0", "南": "1", "西": "2", "北": "3"}
 		for k, v := range r.Form {
 			switch k {
 			case "url":
 				paras["url"] = v[0]
+			case "detect":
+				if v[0] == "detect" {
+					paras["detect"] = v[0]
+				}
 			case "nickname":
 				paras["nickname"] = v[0]
 			case "jikaze":
@@ -91,8 +95,8 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-		// 若没有获取到想要的nickname和jikaze参数
-		if paras["nickname"] == "" && paras["jikaze"] == "" {
+		// 若不采用自动检测，且没有获取到想要的nickname和jikaze参数
+		if paras["detect"] == "" && paras["nickname"] == "" && paras["jikaze"] == "" {
 			// 返回参数格式错误
 			w.WriteHeader(http.StatusBadRequest)
 			err = fmt.Errorf("parameter error")
@@ -102,7 +106,7 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 		}
 		// 以下检查获取到的url。
 		// url格式: "https://game.maj-soul.net/1/?paipu=220926-880ecd12-0b0b-467a-89db-172fe7191263_a57320168"
-		reg := regexp.MustCompile(`https://game.maj-soul.net/1/\?paipu=\d{6}-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`)
+		reg := regexp.MustCompile(`https://game.maj-soul.net/1/\?paipu=\d{6}-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}_a\d+`)
 		if reg == nil {
 			log.Println("regexp err")
 			return
@@ -116,12 +120,14 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 			return
 		} else {
 			s := strings.Split(paras["url"], "=")
-			uuid := strings.Split(s[1], "_")[0]
+			uuidAndAccountId := strings.Split(s[1], "_")
+			uuid := uuidAndAccountId[0]
+			encodedAccountId := strings.TrimLeft(uuidAndAccountId[1], "a")
 			_, err = fmt.Fprintf(w, "后台分析中！\n")
 			if err != nil {
 				return
 			}
-			paras["jikaze"], err = tools.Comm(CONFIG, uuid, paras["nickname"], paras["jikaze"], paras["engine"], w, r)
+			paras["jikaze"], err = tools.Comm(CONFIG, uuid, encodedAccountId, paras["nickname"], paras["detect"], paras["jikaze"], paras["engine"], w, r)
 			if err != nil {
 				fmt.Fprintln(w, err)
 				_, err = fmt.Fprintf(w, "分析失败！\n")

@@ -122,8 +122,31 @@ func writeOutput(w http.ResponseWriter, input io.ReadCloser, flag *error) {
 	input.Close()
 }
 
+// 输入牌谱链接最后的加密编码的account ID，返回检测到的玩家的自风（0~3）
+func detect_from_url(encodedAccountId string, record *message.ResGameRecord) (string, error) {
+	// 获取所有参与对局玩家的account ID列表
+	var accountIdList []uint32
+	accounts := record.Head.Accounts
+	for _, account := range accounts {
+		accountIdList = append(accountIdList, account.AccountId)
+	}
+
+	// 对雀魂加密编码的account ID进行解码，返回字符串形式的decodedAccountId
+	// game.Tools.decode_account_id
+	encodedAccountIdToNum, _ := strconv.ParseUint(encodedAccountId, 10, 32)
+	encodedAccountIdToUint32 := uint32(encodedAccountIdToNum)
+	decodedAccountId := ((encodedAccountIdToUint32 - 1358437 ^ 86216345) - 1117113) / 7
+
+	for idx, accountId := range accountIdList {
+		if accountId == decodedAccountId {
+			return strconv.Itoa(idx), nil
+		}
+	}
+	return "0", fmt.Errorf("no corresponding accountID found")
+}
+
 // 返回自风对应的下标["0", "1", "2", "3"]，以及错误信息
-func Comm(conf *Config, uuid string, nickname string, jikaze string, engine string, w http.ResponseWriter, r *http.Request) (string, error) {
+func Comm(conf *Config, uuid string, encodedAccountId string, nickname string, detect string, jikaze string, engine string, w http.ResponseWriter, r *http.Request) (string, error) {
 	// 创建outputs缓存文件夹
 	path := conf.ReviewerPath + "/outputs/"
 	exist, cerr := exists(path)
@@ -139,6 +162,40 @@ func Comm(conf *Config, uuid string, nickname string, jikaze string, engine stri
 		}
 	}
 
+	var username = conf.Username
+	var password = conf.Password
+	mSoul, err := newMajsoul()
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+	log.Printf("WebSocket网关: %s", mSoul.ServerAddress.GatewayAddress)
+
+	mSoul.UUID = conf.LoginUUID // 可以直接赋空串，但最好不要经常变。可以写个极小概率赋空串？
+	resLogin, err := mSoul.Login(username, password)
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+	if resLogin.Error != nil {
+		log.Println(resLogin.Error)
+		return "", fmt.Errorf(resLogin.Error.String())
+	}
+
+	log.Printf("登录成功！")
+
+	defer mSoul.Logout(mSoul.Ctx, &message.ReqLogout{})
+
+	// 获取具体牌谱内容
+	reqGameRecord := message.ReqGameRecord{
+		GameUuid:            uuid,
+		ClientVersionString: strings.TrimRight("web-"+mSoul.Version.Version, ".w"),
+	}
+	respGameRecord, err := mSoul.FetchGameRecord(mSoul.Ctx, &reqGameRecord)
+	if err != nil {
+		return "", err
+	}
+
 	// 判断牌谱json文件是否存在缓存。如果不存在则下载
 	exist, cerr = exists(conf.ReviewerPath + "/outputs/" + uuid + ".json")
 	if cerr != nil {
@@ -146,49 +203,19 @@ func Comm(conf *Config, uuid string, nickname string, jikaze string, engine stri
 		return "", cerr
 	}
 	if !exist {
-		var username = conf.Username
-		var password = conf.Password
-		mSoul, err := newMajsoul()
-		if err != nil {
-			log.Println(err)
-			return "", err
-		}
-		log.Printf("WebSocket网关: %s", mSoul.ServerAddress.GatewayAddress)
-
-		mSoul.UUID = conf.LoginUUID // 可以直接赋空串，但最好不要经常变。可以写个极小概率赋空串？
-		resLogin, err := mSoul.Login(username, password)
-		if err != nil {
-			log.Println(err)
-			return "", err
-		}
-		if resLogin.Error != nil {
-			log.Println(resLogin.Error)
-			return "", fmt.Errorf(resLogin.Error.String())
-		}
-
-		log.Printf("登录成功！")
-
-		defer mSoul.Logout(mSoul.Ctx, &message.ReqLogout{})
-
-		// 获取具体牌谱内容
-		reqGameRecord := message.ReqGameRecord{
-			GameUuid:            uuid,
-			ClientVersionString: strings.TrimRight("web-"+mSoul.Version.Version, ".w"),
-		}
-		respGameRecord, err := mSoul.FetchGameRecord(mSoul.Ctx, &reqGameRecord)
-		if err != nil {
-			return "", err
-		}
-
 		majsoulLog := Downloadlog(respGameRecord)
-
 		if err = os.WriteFile(path+uuid+".json", majsoulLog, 0644); err != nil {
 			return "", err
 		}
 	}
 
-	// 以昵称为第一优先，获取昵称对应的自风。执行该段语句的前提是之前保证了服务器端存在牌谱的json文件。
-	if nickname != "" {
+	// 检查是否存在自动检测。以自动检测为第一优先
+	if detect == "detect" {
+		jikaze, err = detect_from_url(encodedAccountId, respGameRecord)
+		if err != nil {
+			return "", err
+		}
+	} else if nickname != "" { // 否则以昵称为第二优先，获取昵称对应的自风。执行该段语句的前提是之前保证了服务器端存在牌谱的json文件。
 		res := gojsonq.New().File(conf.ReviewerPath + "/outputs/" + uuid + ".json").From("name").Get()
 		hasNickname := false
 		for i, e := range res.([]interface{}) {
