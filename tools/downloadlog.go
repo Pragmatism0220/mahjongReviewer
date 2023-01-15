@@ -15,8 +15,8 @@ import (
 )
 
 /*
- * 查看最新version：https://game.maj-soul.net/1/version.json
- * 当前适配版本：v0.10.176.w/code.js
+ * 查看最新version：https://game.maj-soul.com/1/version.json
+ * 当前适配版本：v0.10.180.w/code.js
  */
 
 const NAMEPREF = 1       //2 for english, 1 for sane amount of weeb, 0 for japanese
@@ -258,6 +258,8 @@ var CFG_SEX = map[string][]string{
 	"200063": {"1", "1", "1"},
 	"200064": {"1", "1", "1"},
 	"200065": {"1", "1", "1"},
+	"200066": {"1", "1", "1"},
+	"200067": {"1", "1", "1"},
 }
 
 var CFG_YAKU = map[string][]string{

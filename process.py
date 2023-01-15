@@ -8,7 +8,7 @@ print(s)
 
 """
 本代码实现了逐行读取本地txt文件，并将其输出为JavaScript数组的形式。
-可以用来在浏览器端console台爬取雀魂（https://game.maj-soul.net/）人物、役种等函数映射输出。
+可以用来在浏览器端console台爬取雀魂（https://game.maj-soul.com/）人物、役种等函数映射输出。
 
 样例JavaScript代码如下（在console运行）：
 var s = "";
