@@ -106,7 +106,7 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 		}
 		// 以下检查获取到的url。
 		// url格式: "https://game.maj-soul.com/1/?paipu=220926-880ecd12-0b0b-467a-89db-172fe7191263_a57320168"
-		reg := regexp.MustCompile(`https://game.maj-soul.com/1/\?paipu=\d{6}-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}_a\d+`)
+		reg := regexp.MustCompile(`https://game\.maj-soul\.com/1/\?paipu=\d{6}-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}_a\d+`)
 		if reg == nil {
 			log.Println("regexp err")
 			return
