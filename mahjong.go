@@ -234,7 +234,7 @@ func main() {
 	router := violetear.New()
 	router.HandleFunc("/mahjong", getMahjongURL, "GET")
 	router.Handle("/mahjong/analyse", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil), analyse), "POST")
-	router.Handle("/mahjong/result", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil).SetMethods([]string{"POST"}), result), "GET,POST")
+	router.Handle("/mahjong/result", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil), result), "GET,POST")
 	err = http.ListenAndServe(":9090", router)
 	if err != nil {
 		log.Println(err)
