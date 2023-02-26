@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/Pragmatism0220/majsoul v0.1.4
+	github.com/didip/tollbooth/v7 v7.0.1
 	github.com/golang/protobuf v1.5.2
 	github.com/nbari/violetear v0.0.0-20210524103009-ce83b52538c9
 	github.com/thedevsaddam/gojsonq/v2 v2.5.2
@@ -11,6 +12,7 @@ require (
 
 require (
 	github.com/go-ping/ping v1.1.0 // indirect
+	github.com/go-pkgz/expirable-cache v0.1.0 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect

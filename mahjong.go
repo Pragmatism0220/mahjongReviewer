@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/didip/tollbooth/v7"
 	"github.com/nbari/violetear"
 )
 
@@ -29,7 +30,7 @@ func initConfig() error {
 }
 
 func getMahjongURL(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/mahjong" {
+	if r.URL.Path == "/mahjong" || r.URL.Path == "/mahjong/" {
 		tmpl, err := template.ParseFiles("./index.html")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -47,7 +48,7 @@ func getMahjongURL(w http.ResponseWriter, r *http.Request) {
 }
 
 func analyse(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/mahjong/analyse" {
+	if r.URL.Path == "/mahjong/analyse" || r.URL.Path == "/mahjong/analyse/" {
 		tmpl, err := template.ParseFiles("./analyse.html")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -106,7 +107,7 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 		}
 		// 以下检查获取到的url。
 		// url格式: "https://game.maj-soul.com/1/?paipu=220926-880ecd12-0b0b-467a-89db-172fe7191263_a57320168"
-		reg := regexp.MustCompile(`https://game\.maj-soul\.com/1/\?paipu=\d{6}-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}_a\d+`)
+		reg := regexp.MustCompile(`https://game\.maj-soul\.(com|net)/1/\?paipu=\d{6}-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}_a\d+`)
 		if reg == nil {
 			log.Println("regexp err")
 			return
@@ -166,7 +167,7 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 }
 
 func result(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/mahjong/result" {
+	if r.URL.Path == "/mahjong/result" || r.URL.Path == "/mahjong/result/" {
 		err := r.ParseForm()
 		if err != nil {
 			return
@@ -232,8 +233,8 @@ func main() {
 	}
 	router := violetear.New()
 	router.HandleFunc("/mahjong", getMahjongURL, "GET")
-	router.HandleFunc("/mahjong/analyse", analyse, "POST")
-	router.HandleFunc("/mahjong/result", result, "GET,POST")
+	router.Handle("/mahjong/analyse", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil), analyse), "POST")
+	router.Handle("/mahjong/result", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil).SetMethods([]string{"POST"}), result), "GET,POST")
 	err = http.ListenAndServe(":9090", router)
 	if err != nil {
 		log.Println(err)
