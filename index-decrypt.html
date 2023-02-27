@@ -1,86 +1,219 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-cn">
 <head>
-    <meta charset="UTF-8">
-    <title>雀魂牌谱分析</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/Pragmatism0220/mahjongReviewer@latest/resources/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.jsdelivr.net/gh/Pragmatism0220/mahjongReviewer@latest/resources/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.jsdelivr.net/gh/Pragmatism0220/mahjongReviewer@latest/resources/favicon-16x16.png">
+  <link rel="manifest" href="https://cdn.jsdelivr.net/gh/Pragmatism0220/mahjongReviewer@latest/resources/site.webmanifest">
+
+  <title>麻将 AI 工具 - 检讨牌谱</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gugi&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC&display=swap">
+  <link rel="stylesheet" href="https://unpkg.com/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Pragmatism0220/mahjongReviewer@latest/resources/index.css?d=23021205">
 </head>
+
 <body>
 <script>
-    let MODE = false;
-    function switch_mode() {
-        if (true === MODE) {
-            document.getElementById("mode1").style.display = "none";
-            document.getElementById("nickname").value = ""
-            document.getElementById("mode2").style.display = "";
-            document.getElementById("choice_mode").innerHTML = "切换为昵称输入";
-            MODE = !MODE
-        } else {
-            document.getElementById("mode2").style.display = "none";
-            document.getElementById("jikaze")[0].selected = true
-            document.getElementById("mode1").style.display = "";
-            document.getElementById("choice_mode").innerHTML = "切换为自风输入";
-            MODE = !MODE
-        }
+  let MODE = false;
+  function switch_mode() {
+    if (true === MODE) {
+      document.getElementById("mode2").style.display = "none";
+      document.getElementById("mode1").style.display = "";
+      MODE = !MODE
+    } else {
+      document.getElementById("mode1").style.display = "none";
+      document.getElementById("mode2").style.display = "";
+      MODE = !MODE
     }
-
-    function detect_from_url() {
-        let choice_mode_btn = document.getElementById("choice_mode");
-        let jikaze_choice = document.getElementById("jikaze");
-        let nickname_input = document.getElementById("nickname");
-        const detect = document.getElementById("detect");
-        if (detect.checked) {
-            choice_mode_btn.disabled = true;
-            jikaze_choice.disabled = true;
-            nickname_input.disabled = true;
-        } else {
-            choice_mode_btn.disabled = false;
-            jikaze_choice.disabled = false;
-            nickname_input.disabled = false;
-        }
-    }
+  }
 </script>
-<button id="choice_mode" onclick="switch_mode()" disabled="disabled">切换为昵称输入</button>
-<br/>
-<br/>
-<form action="/mahjong/analyse" method="post">雀魂牌谱网址：
-    <label>
-        <input type="text" name="url" style="width:600px;"></label>
-    &nbsp;&nbsp;引擎：
-    <label>
-        <select id="engine" name="engine">
-            <option value="mortal">mortal</option>
-            <option value="akochan">akochan</option>
-        </select>
-    </label>
-    <br/>
-    <br/>
-    <span>
-        <input type="checkbox" id="detect" name="detect" value="detect" onclick="detect_from_url()" checked>
-        <label for="detect">从牌谱URL中自动检测（此选项具有更高的优先级）</label>
-    </span>
-    <br/>
-    <br/>
-    <span id="mode1" style="display: none">昵称：
-        <label>
-          <input id="nickname" type="text" name="nickname" style="width:160px;" disabled="disabled">
-        </label>
-    </span>
-    <span id="mode2">自风：
-        <label>
-            <select id="jikaze" name="jikaze" disabled="disabled">
-                <option value="东">东</option>
-                <option value="南">南</option>
-                <option value="西">西</option>
-                <option value="北">北</option>
-            </select>
-        </label>
-    </span>
-    <br/>
-    <br/>
-    <input type="submit" value=" 分    析 ">
-</form>
-<div style="height:100%; width:100%;">
-    <img style="position: absolute; float: right; right: 5px; bottom: 5px; z-index: 2;" src="https://cdn.jsdelivr.net/gh/Pragmatism0220/mahjongReviewer@latest/images/nilou.gif" alt="Nilou kawaii!!">
-</div>
+<article>
+  <header class="section has-background-white" id="top">
+    <div class="container is-max-desktop">
+      <h1 class="mb-5">
+        <span class="title is-3">麻将 AI 工具</span>
+        <span class="subtitle is-5 has-text-weight-semibold"> - 检讨牌谱</span>
+      </h1>
+    </div>
+  </header>
+
+  <section class="section has-background-white-ter" id="review">
+    <div class="container is-max-desktop">
+      <h2 class="mb-5">
+        <span class="title is-4">Review your game</span>
+        <span class="subtitle is-6 has-text-weight-semibold"> / 检讨牌谱</span>
+      </h2>
+
+      <div class="notification is-bordered has-background-white mx-4">
+        <div class="content">
+          <h2>注意</h2>
+          <ol>
+            <li>只接受<span class="strong">四麻</span>牌谱。</li>
+            <li>只有<span class="strong">一般规则</span>的牌谱才能使用，例如段位战的牌谱。</li>
+            <li>对于 Mortal 引擎，只接受<span class="strong">半庄（东南）</span>牌谱。</li>
+          </ol>
+        </div>
+      </div>
+
+      <form class="form" name="reviewForm" method="POST" action="/mahjong/analyse" onsubmit="this.submitBtn.disabled=true">
+        <div class="field">
+          <label class="label">牌谱输入</label>
+          <div class="control mx-4">
+            <p>
+              <label class="content">
+                URL (目前只支持雀魂)
+              </label>
+            </p>
+            <p class="my-2">
+              <input type="url" class="input" id="log-url" name="url" required placeholder="https://game.maj-soul.com/1/?paipu=220826-6a22c4a5-5810-4d28-b6dc-cb0038aa5a34_a88854589">
+            </p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">目标</label>
+          <div class="control mx-4">
+            <p>
+              <label class="radio">
+                <input type="radio" name="input-method" value="kaze" onchange="switch_mode()" checked>
+                自风
+              </label>
+            </p>
+            <p class="my-2">
+                  <span id="mode1" class="select">
+                    <select id="jikaze" name="jikaze">
+                      <option value="检测" selected>从 URL 自动检测</option>
+                      <option value="东">东起</option>
+                      <option value="南">南起</option>
+                      <option value="西">西起</option>
+                      <option value="北">北起</option>
+                    </select>
+                  </span>
+            </p>
+            <p>
+              <label class="radio">
+                <input type="radio" name="input-method" value="nickname" onchange="switch_mode()">
+                昵称
+              </label>
+            </p>
+            <p class="my-2 is-flex">
+              <span id="mode2" style="display: none">
+                <input type="text" class="input" id="nickname" name="nickname" placeholder="要检讨的玩家的雀魂昵称">
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">引擎</label>
+          <div class="control mx-4">
+            <p>
+                  <span class="select">
+                    <select name="engine" onchange="changeEngine(this.options[this.selectedIndex].value)">
+                      <option value="mortal" selected>Mortal</option>
+                      <option value="akochan">akochan</option>
+                    </select>
+                  </span>
+            </p>
+            <p class="strong my-2" id="akochan-warning" style="display: none">
+              ⚠️ akochan 非常慢。
+            </p>
+          </div>
+        </div>
+        <br />
+
+        <div class="field">
+          <div class="control">
+            <p class="is-flex is-align-items-center">
+              <button type="submit" class="button is-success" name="submitBtn">提交</button>
+              <a class="button is-ghost" href="https://gh.ekyu.moe/mjai-reviewer-demo.html" target="_blank" rel="noreferrer noopener">例子</a>
+            </p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="section has-background-white" id="faq">
+    <div class="container is-max-desktop">
+      <h2 class="mb-5">
+        <span class="title is-4">FAQ</span>
+        <span class="subtitle is-6 has-text-weight-semibold"> / 常见问题</span>
+      </h2>
+
+      <div class="notification is-bordered has-background-white mx-4">
+        <div class="content">
+          <p>
+            <a class="has-text-link" href="https://github.com/Equim-chan/mjai-reviewer/blob/master/faq.md" target="_blank"
+               rel="noopener">点这里</a>可以看有关 reviewer 本身的 FAQ。
+          </p>
+        </div>
+      </div>
+
+      <div class="content">
+        <h3 class="is-size-5">检讨一张牌谱要多久？</h3>
+        <p class="mx-4">对于 Mortal 引擎，一般 10 秒内。</p>
+        <p class="mx-4">对于 akochan 引擎，10 到 60 分钟，取决于游戏的长度以及工作队列的大小。</p>
+
+        <h3 class="is-size-5">检讨报告会在服务器保存多久？</h3>
+        <p class="mx-4">超过 1 天的检讨报告会被删除，有需要的话可以自行保存网页。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section has-background-white-ter" id="about">
+    <div class="container is-max-desktop">
+      <h2 class="mb-5">
+        <span class="title is-4">About</span>
+        <span class="subtitle is-6 has-text-weight-semibold"> / 关于本站</span>
+      </h2>
+
+      <div class="content">
+        <h3 class="is-size-5">Powered by</h3>
+        <p class="mx-4">
+          <a href="https://github.com/Equim-chan/mjai-reviewer" target="_blank" rel="noopener">
+            <img alt="Equim-chan/mjai-reviewer" src="https://mjai.ekyu.moe/github-readme-stats?username=Equim-chan&repo=mjai-reviewer&show_owner=true">
+          </a>
+          <a href="https://github.com/Equim-chan/Mortal" target="_blank" rel="noopener">
+            <img alt="Equim-chan/Mortal" src="https://mjai.ekyu.moe/github-readme-stats?username=Equim-chan&repo=Mortal&show_owner=true">
+          </a>
+          <a href="https://github.com/critter-mj/akochan" target="_blank" rel="noopener">
+            <img alt="critter-mj/akochan" src="https://mjai.ekyu.moe/github-readme-stats?username=critter-mj&repo=akochan&show_owner=true">
+          </a>
+        </p>
+
+        <h3 class="is-size-5">Developed and maintained by</h3>
+        <p class="mx-4">
+          Equim
+          (<a href="https://twitter.com/equim_chan" target="_blank" rel="noreferrer noopener">Twitter</a>,
+          <a href="https://github.com/Equim-chan" target="_blank" rel="noopener">GitHub</a>,
+          <a href="https://nodocchi.moe/tenhoulog/#!&name=%E4%BA%8C%E5%AE%AE%E8%98%AD%E5%AD%90" target="_blank" rel="noreferrer noopener">天鳳</a>)
+        </p>
+
+        <h3 class="is-size-5">Frontend designed by</h3>
+        <p class="mx-4">
+          新篠ゆう
+          (<a href="https://twitter.com/yuarasino" target="_blank" rel="noreferrer noopener">Twitter</a>,
+          <a href="https://www.youtube.com/c/yuarasino" target="_blank" rel="noreferrer noopener">YouTube</a>)
+        </p>
+
+        <h3 class="is-size-5">Infrastructure sponsored by</h3>
+        <p class="mx-4">
+          EDWARDH
+          (<a href="https://twitter.com/EDWARDH_Jantama" target="_blank" rel="noreferrer noopener">Twitter</a>)
+        </p>
+      </div>
+    </div>
+  </section>
+</article>
+
+<style>#forkongithub a{background:#007200;color:#fff;text-decoration:none;font-family:arial,sans-serif;text-align:center;font-weight:bold;padding:5px 40px;font-size:1rem;line-height:2rem;position:relative;transition:0.5s;}#forkongithub a:hover{background:#c11;color:#fff;}#forkongithub a::before,#forkongithub a::after{content:"";width:100%;display:block;position:absolute;top:1px;left:0;height:1px;background:#fff;}#forkongithub a::after{bottom:1px;top:auto;}@media screen and (min-width:800px){#forkongithub{box-sizing:content-box;position:fixed;display:block;top:0;right:0;width:200px;overflow:hidden;height:200px;z-index:9999;}#forkongithub a{width:200px;position:absolute;top:60px;right:-60px;transform:rotate(45deg);-webkit-transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg);-o-transform:rotate(45deg);box-shadow:4px 4px 10px rgba(0,0,0,0.8);}}</style><span id="forkongithub"><a href="https://github.com/Equim-chan/mjai-reviewer" target="_blank" rel="noopener">Fork me on GitHub</a></span>
 </body>
 </html>

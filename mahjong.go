@@ -65,21 +65,21 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return
 		}
-		paras := map[string]string{"url": "", "detect": "", "nickname": "", "jikaze": "", "engine": "mortal"} // 默认mortal引擎
+		paras := map[string]string{"url": "", "detect": "", "nickname": "", "jikaze": "", "input-method": "", "engine": "mortal"} // 默认Mortal引擎
 		kaze := map[string]string{"东": "0", "南": "1", "西": "2", "北": "3"}
 		for k, v := range r.Form {
 			switch k {
 			case "url":
 				paras["url"] = v[0]
-			case "detect":
-				if v[0] == "detect" {
-					paras["detect"] = v[0]
-				}
 			case "nickname":
 				paras["nickname"] = v[0]
 			case "jikaze":
-				if len(v) != 0 && (v[0] == "东" || v[0] == "南" || v[0] == "西" || v[0] == "北") {
-					paras["jikaze"] = kaze[v[0]]
+				if len(v) != 0 && (v[0] == "检测" || v[0] == "东" || v[0] == "南" || v[0] == "西" || v[0] == "北") {
+					if v[0] == "检测" {
+						paras["detect"] = "detect"
+					} else {
+						paras["jikaze"] = kaze[v[0]]
+					}
 				} else {
 					// 返回参数格式错误
 					w.WriteHeader(http.StatusBadRequest)
@@ -94,16 +94,32 @@ func analyse(w http.ResponseWriter, r *http.Request) {
 				} else {
 					paras["engine"] = "mortal"
 				}
+			case "input-method":
+				if len(v) != 0 {
+					switch v[0] {
+					case "kaze":
+						paras["input-method"] = "kaze"
+					case "nickname":
+						paras["input-method"] = "nickname"
+					}
+				}
 			}
 		}
-		// 若不采用自动检测，且没有获取到想要的nickname和jikaze参数
-		if paras["detect"] == "" && paras["nickname"] == "" && paras["jikaze"] == "" {
+		// 若没有选择输入方式，或不采用自动检测，且没有获取到想要的nickname和jikaze参数
+		if paras["input-method"] == "" || (paras["detect"] == "" && paras["nickname"] == "" && paras["jikaze"] == "") {
 			// 返回参数格式错误
 			w.WriteHeader(http.StatusBadRequest)
 			err = fmt.Errorf("parameter error")
 			fmt.Fprintln(w, err)
 			log.Println("/analyse: ", err)
 			return
+		}
+		switch paras["input-method"] {
+		case "kaze":
+			paras["nickname"] = ""
+		case "nickname":
+			paras["jikaze"] = ""
+			paras["detect"] = ""
 		}
 		// 以下检查获取到的url。
 		// url格式: "https://game.maj-soul.com/1/?paipu=220926-880ecd12-0b0b-467a-89db-172fe7191263_a57320168"
