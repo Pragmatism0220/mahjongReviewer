@@ -1,0 +1,94 @@
+/* Lang Fonts */
+
+html[lang="en"] body {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+html[lang="en"] :is(h1, h2) {
+  font-family: 'Gugi', 'Noto Sans', sans-serif;
+}
+
+html[lang="zh-cn"] body {
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+html[lang="zh-cn"] :is(h1, h2) {
+  font-family: 'Gugi', 'Noto Sans SC', sans-serif;
+}
+
+html[lang="ja"] body {
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+html[lang="ja"] :is(h1, h2) {
+  font-family: 'Gugi', 'Noto Sans JP', sans-serif;
+}
+
+html[lang="ko"] body {
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+html[lang="ko"] :is(h1, h2) {
+  font-family: 'Gugi', 'Noto Sans KR', sans-serif;
+}
+
+
+/* HTML Tags */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+sup {
+  color: darkred;
+}
+
+code {
+  color: crimson;
+  background-color: #fff;
+  border: 1px solid #eaecf0;
+  border-radius: 2px;
+  padding: 2px 4px;
+}
+
+input[type="number"] {
+  width: 10rem;
+}
+
+
+/* Bulma Classes */
+
+.notification.is-bordered {
+  border: 1px solid #dbdbdb;
+}
+
+.notification a:not(.button):not(.dropdown-item) {
+  text-decoration: none;
+}
+
+
+/* Site Classes */
+
+.strong {
+  font-weight: bold;
+  color: orangered;
+}
+
+.note {
+  color: darkred;
+  font-size: .8rem;
+}
+
+.details {
+  margin-bottom: 0.75rem;
+}
+
+.summary {
+  margin-bottom: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+}
