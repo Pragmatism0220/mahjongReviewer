@@ -2,9 +2,12 @@
 [mjai-reviewer](https://github.com/Equim-chan/mjai-reviewer)的前后端程序。
 
 ## 它是什么
-这是一个[mjai-reviewer](https://github.com/Equim-chan/mjai-reviewer)的前后端程序。界面非常简单。在浏览器端输入雀魂的牌谱网址，即可在服务器端调用akochan或mortal引擎对牌谱进行分析。分析过程会通过流式传输进行实时显示，并在分析结束后自动跳转至结果界面。
+这是一个[mjai-reviewer](https://github.com/Equim-chan/mjai-reviewer)的前后端程序。界面非常简单。在浏览器端输入雀魂的牌谱网址，即可在服务器端调用akochan或Mortal引擎对牌谱进行分析。分析过程会通过流式传输进行实时显示，并在分析结束后自动跳转至结果界面。
 
-演示过程如下图所示，依次是主界面、分析界面、结果界面。用户可以选择从牌谱链接中自动识别玩家、或者选择自定义指定玩家进行分析：
+> 其中，主界面是扒自[麻将 AI 工具 - 检讨牌谱，派遣个室](https://mjai.ekyu.moe/zh-cn.html)，界面UI版权归原作者所有。这里仅为我个人为了尽可能地模仿、复现而进行的学习，仅供学习使用。如有侵犯，可随时联系我删除。
+
+演示过程如下图所示，依次是主界面登录界面、主界面、分析界面、结果界面。用户可以选择从牌谱链接中自动识别玩家、或者选择自定义指定玩家进行分析：
+![主界面登录界面](/images/verify.png)
 ![主界面](/images/mahjong.png)
 ![分析界面](/images/analyse.png)
 ![结果界面](/images/result.png)
