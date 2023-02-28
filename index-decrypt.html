@@ -22,7 +22,7 @@
 <body>
 <script>
   let MODE = false;
-  function switch_mode() {
+  function switchMode() {
     if (true === MODE) {
       document.getElementById("mode2").style.display = "none";
       document.getElementById("mode1").style.display = "";
@@ -31,6 +31,14 @@
       document.getElementById("mode1").style.display = "none";
       document.getElementById("mode2").style.display = "";
       MODE = !MODE
+    }
+  }
+
+  function changeEngine(engine) {
+    if (engine === "akochan") {
+      document.getElementById("akochan-warning").style.display = "block";
+    } else {
+      document.getElementById("akochan-warning").style.display = "none";
     }
   }
 </script>
@@ -82,7 +90,7 @@
           <div class="control mx-4">
             <p>
               <label class="radio">
-                <input type="radio" name="input-method" value="kaze" onchange="switch_mode()" checked>
+                <input type="radio" name="input-method" value="kaze" onchange="switchMode()" checked>
                 自风
               </label>
             </p>
@@ -99,7 +107,7 @@
             </p>
             <p>
               <label class="radio">
-                <input type="radio" name="input-method" value="nickname" onchange="switch_mode()">
+                <input type="radio" name="input-method" value="nickname" onchange="switchMode()">
                 昵称
               </label>
             </p>
@@ -160,7 +168,7 @@
       <div class="content">
         <h3 class="is-size-5">检讨一张牌谱要多久？</h3>
         <p class="mx-4">对于 Mortal 引擎，一般 10 秒内。</p>
-        <p class="mx-4">对于 akochan 引擎，10 到 60 分钟，取决于游戏的长度以及工作队列的大小。</p>
+        <p class="mx-4">对于 akochan 引擎，10 到 60 分钟，取决于游戏的长度等因素。</p>
 
         <h3 class="is-size-5">检讨报告会在服务器保存多久？</h3>
         <p class="mx-4">超过 1 天的检讨报告会被删除，有需要的话可以自行保存网页。</p>

@@ -113,11 +113,17 @@ func writeOutput(w http.ResponseWriter, input io.ReadCloser, flag *error) {
 	for in.Scan() {
 		data := in.Text()
 		log.Printf("data: %s\n", data)
-		fmt.Fprintf(w, "data: %s\n", data)
-		if data[0:6] == "error:" {
-			*flag = fmt.Errorf(data)
+		if data != "" {
+			if len(data) >= 6 && strings.EqualFold(data[0:6], "error:") {
+				*flag = fmt.Errorf(data)
+				flusher.Flush()
+				input.Close()
+				return
+			} else {
+				fmt.Fprintf(w, "data: %s\n", data)
+			}
+			flusher.Flush()
 		}
-		flusher.Flush()
 	}
 	input.Close()
 }

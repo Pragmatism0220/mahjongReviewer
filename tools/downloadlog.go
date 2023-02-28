@@ -16,10 +16,10 @@ import (
 
 /*
  * 查看最新version：https://game.maj-soul.com/1/version.json
- * 当前适配版本：v0.10.180.w/code.js
+ * 当前适配版本：v0.10.176.w/code.js
  */
 
-const NAMEPREF = 1       //2 for english, 1 for sane amount of weeb, 0 for japanese
+const NAMEPREF = 0       //2 for english, 1 for sane amount of weeb, 0 for japanese
 const VERBOSELOG = false //dump mjs records to output - will make the file too large for tenhou.net/5 viewer
 const PRETTY = true      //make the written log somewhat human readable
 const SHOWFU = false     //always show fu/han for scoring - even for limit hands
