@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/didip/tollbooth/v7"
+	"github.com/go-http-utils/favicon"
 	"github.com/nbari/violetear"
 )
 
@@ -251,7 +252,7 @@ func main() {
 	router.HandleFunc("/mahjong", getMahjongURL, "GET")
 	router.Handle("/mahjong/analyse", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil), analyse), "POST")
 	router.Handle("/mahjong/result", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, nil), result), "GET,POST")
-	err = http.ListenAndServe(":9090", router)
+	err = http.ListenAndServe(":9090", favicon.Handler(router, "./resources/favicon.ico"))
 	if err != nil {
 		log.Println(err)
 		return

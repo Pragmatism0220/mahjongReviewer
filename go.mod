@@ -5,12 +5,14 @@ go 1.19
 require (
 	github.com/Pragmatism0220/majsoul v0.1.4
 	github.com/didip/tollbooth/v7 v7.0.1
+	github.com/go-http-utils/favicon v0.0.0-20161126135952-0951e1268fd5
 	github.com/golang/protobuf v1.5.2
 	github.com/nbari/violetear v0.0.0-20210524103009-ce83b52538c9
 	github.com/thedevsaddam/gojsonq/v2 v2.5.2
 )
 
 require (
+	github.com/go-http-utils/headers v0.0.0-20181008091004-fed159eddc2a // indirect
 	github.com/go-ping/ping v1.1.0 // indirect
 	github.com/go-pkgz/expirable-cache v0.1.0 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
