@@ -2,14 +2,17 @@ package tools
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"math"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/Pragmatism0220/majsoul"
 	"github.com/Pragmatism0220/majsoul/message"
 	"github.com/golang/protobuf/proto"
 )
@@ -363,12 +366,12 @@ const TSUMOGIRI = 60 //tenhou tsumogiri symbol
 var ALLOW_KIRIAGE = false //potentially allow this to be true
 var TSUMOLOSSOFF = false  //sanma tsumo loss, is set true for sanma when tsumo loss off
 
-func decodeMessage(data []byte) interface{} {
-	type messageWithType struct {
-		Name string        `json:"name"`
-		Data proto.Message `json:"data"`
-	}
+type messageWithType struct {
+	Name string        `json:"name"`
+	Data proto.Message `json:"data"`
+}
 
+func decodeMessage(data []byte) interface{} {
 	if len(data) != 0 {
 		name, data_, err := UnwrapData(data)
 		if err != nil {
@@ -1119,6 +1122,7 @@ func generatelog(mjslog []interface{}) interface{} {
 			entry = append(entry, tstr) //needs the japanese agari
 			resLog = append(resLog, entry)
 		default:
+			log.Println(e)
 			log.Printf("Didn't know what to do.\n")
 		}
 	}
@@ -1133,11 +1137,40 @@ func parse(record *message.ResGameRecord) map[string]interface{} {
 	nakas := nplayers - 1 //default
 	// anon edit 1 start
 	var mjslog []interface{}
-	mjsact := decodeMessage(record.Data).(*message.GameDetailRecords).Actions
 
-	for _, e := range mjsact {
-		if len(e.Result) != 0 {
-			mjslog = append(mjslog, decodeMessage(e.Result))
+	if record.DataUrl != "" { // 2019/12/31以前的牌谱
+		data, err := majsoul.Fetch(record.DataUrl)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return nil
+		}
+		detailRecords := message.GameDetailRecords{}
+		if err = UnwrapMessage(data, &detailRecords); err != nil {
+			return nil
+		}
+		for _, detailRecord := range detailRecords.GetRecords() {
+			if len(detailRecord) != 0 {
+				mjslog = append(mjslog, decodeMessage(detailRecord))
+			}
+		}
+	} else {
+		recordActions := decodeMessage(record.Data).(*message.GameDetailRecords)
+		if recordActions.Version == 0 { // 2021/07/28以前的牌谱
+			mjsact := recordActions.Records
+			for _, e := range mjsact {
+				if len(e) != 0 {
+					mjslog = append(mjslog, decodeMessage(e))
+				}
+			}
+		} else if recordActions.Version == 210715 {
+			mjsact := recordActions.Actions
+			for _, e := range mjsact {
+				if len(e.Result) != 0 {
+					mjslog = append(mjslog, decodeMessage(e.Result))
+				}
+			}
+		} else { // unknown version
+			return nil
 		}
 	}
 	// anon edit 1 end
@@ -1289,19 +1322,33 @@ func parse(record *message.ResGameRecord) map[string]interface{} {
 	return res
 }
 
-func Downloadlog(record *message.ResGameRecord) []byte {
+func Downloadlog(record *message.ResGameRecord) (jsonData []byte, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			jsonData = nil
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				// Fallback err (per specs, error strings should be lowercase w/o punctuation
+				err = errors.New("download failed with unknown panic")
+			}
+		}
+	}()
 	results := parse(record)
 	if PRETTY {
-		jsonData, err := json.MarshalIndent(results, "", "    ")
+		jsonData, err = json.MarshalIndent(results, "", "    ")
 		if err != nil {
-			return nil
+			return nil, err
 		}
-		return jsonData
+		return jsonData, nil
 	} else {
-		jsonData, err := json.Marshal(results)
+		jsonData, err = json.Marshal(results)
 		if err != nil {
-			return nil
+			return nil, err
 		}
-		return jsonData
+		return jsonData, nil
 	}
 }
